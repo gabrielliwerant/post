@@ -11,13 +11,13 @@
  */
 
 /**
- * PostRequest Class
+ * PostRequestMock Class
  * 
  * @subpackage post
  * @author Jonas John, modified by Gabriel Liwerant
  * @link http://www.jonasjohn.de/snippets/php/post-request.htm
  */
-class PostRequest
+class PostRequestMock
 {
 	/**
 	 * Error codes for PostRequest Class
@@ -112,8 +112,8 @@ class PostRequest
 	}
 	
 	/**
-	 * This function recreates the post request method for form data and sends 
-	 * to the original URL.
+	 * This function mocks the post request method for form data to send to the 
+	 * original URL.
 	 *
 	 * @param string $url URL that is sending the request
 	 * @param array &$data Post data being sent
@@ -134,56 +134,15 @@ class PostRequest
 		$host	= $this->_getHostIfSsl($url['host']);
 		$path	= $url['path'];
 
-		$fp = fsockopen($host, $port, $err_number, $err_string, $timeout);
-
-		if ($fp)
-		{
-			// Send the request headers:
-			fwrite($fp, "POST $path HTTP/1.1\r\n");
-			fwrite($fp, "Host: $host\r\n");
-
-			if ( ! empty($referer))
-			{
-				fwrites($fp, "Referer: $referer\r\n");
-			}
-
-			fwrite($fp, "Content-type: application/x-www-form-urlencoded\r\n");
-			fwrite($fp, "Content-length: " . strlen($data_query_string) . "\r\n");
-			fwrite($fp, "Connection: close\r\n\r\n");
-			fwrite($fp, $data_query_string);
-
-			$result = null; 
-			
-			while ( ! feof($fp))
-			{
-				// Receive the results of the request
-				$result .= fgets($fp, 128);
-			}
-		}
-		else
-		{
-			return array(
-				'is_successful'	=> 'false', 
-				'error'			=> $err_string . '(' . $err_number . ')'
-			);
-		}
-
-		// Close the socket connection
-		fclose($fp);
-
-		// Split the result header from the content
-		$result = explode("\r\n\r\n", $result, 2);
-
-		$header		= isset($result[0]) ? $result[0] : null;
-		$content	= isset($result[1]) ? $result[1] : null;
-		
 		return array(
 			'is_successful'	=> 'true',
-			'header'		=> $header,
-			'content'		=> $content
+			'data'			=> $data_query_string,
+			'url'			=> $url,
+			'port'			=> $port,
+			'path'			=> $path
 		);
 	}
 }
-// End of PostRequest Class
+// End of PostRequestMock Class
 
-/* EOF post/PostRequest.php */
+/* EOF post/PostRequestMock.php */
